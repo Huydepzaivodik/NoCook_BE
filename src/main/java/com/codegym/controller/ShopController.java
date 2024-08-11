@@ -2,6 +2,8 @@ package com.codegym.controller;
 
 import com.codegym.model.*;
 import com.codegym.service.IShopService;
+import com.codegym.service.impl.RoleServiceImpl;
+import com.codegym.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -22,8 +24,19 @@ public class ShopController {
     @Autowired
     IShopService shopService;
 
+    @Autowired
+    RoleServiceImpl roleService;
+
+    @Autowired
+    UserServiceImpl userService;
+
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Shop shop) {
+           shop.setIsLoyal(false);
+           shop.setUser(userService.findById(shop.getUser().getId()).get());
+           shop.getUser().getRoles().add(roleService.findById(Long.parseLong("2")));
+           shop.setStatus(false);
            shopService.save(shop);
            return new ResponseEntity<>("SUCCESSED",HttpStatus.OK);
     }

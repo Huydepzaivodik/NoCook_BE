@@ -20,7 +20,7 @@ public interface FoodRepository extends JpaRepository<Food,Long> {
     @Query(value = "select f from Food f where f.shop.id = :id")
     List<Food> getSameFoodsByShopId(@Param("id") Long id);
 
-    @Query(value = "select fiq.food_id from (select op.food_id, sum(quantity) as quantity from order_product op join orders o on o.id = op.order_id where DAY(o.orders_date) = DAY(current_date()) AND MONTH(o.orders_date) = MONTH(current_date()) AND YEAR(o.orders_date) = YEAR(current_date()) group by op.food_id,o.orders_date) as fiq order by fiq.quantity desc", nativeQuery = true)
+    @Query(value = "select fiq.food_id from (select op.food_id, sum(quantity) as quantity from order_product op join orders o on o.id = op.order_id where DAY(o.orders_date) = DAY(current_date()) AND MONTH(o.orders_date) = MONTH(current_date()) AND YEAR(o.orders_date) = YEAR(current_date()) group by op.food_id) as fiq order by fiq.quantity desc", nativeQuery = true)
     List<Long> getBestsellerFoodToday();
 
     @Query(value = "select f.id from food  f inner join shop s on s.id = f.shop_id where s.address like %:address%", nativeQuery = true)

@@ -32,6 +32,12 @@ dependencies {
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.0.10.Final'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '3.3.2'
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation group: 'org.apache.poi', name: 'poi', version: '3.9'
+
+
 }
 
 tasks.named('test') {

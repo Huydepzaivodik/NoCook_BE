@@ -40,9 +40,9 @@ public class CartController {
     @PostMapping("/delete/{id}")
     public ResponseEntity<?> deleteFood(@PathVariable Long id,@RequestBody Food food){
            Cart cart = cartService.findByUserId(id);
-        System.out.println(food.toString());
+           System.out.println(food.toString());
            cart.getFood().remove(food);
-        System.out.println(cart.getFood().toString());
+           System.out.println(cart.getFood().toString());
            cartService.save(cart);
            return new ResponseEntity<>("DELETING DONE",HttpStatus.OK);
     }

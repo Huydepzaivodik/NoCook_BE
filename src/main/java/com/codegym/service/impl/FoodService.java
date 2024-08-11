@@ -83,30 +83,28 @@ public class FoodService implements IFoodService {
 
     @Override
     public List<Food> FilterFood(String address, String coupon, Double start, Double end) {
-
-
         ObjectMapper mapper = new ObjectMapper();
         String address_name = new String();
         String[] arr = new String[2];
         if(address != null)
-//            arr= address.split("-");
-//        try {
-//            URL url = new URL("https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json");
-//            List<Object> data = mapper.readValue(url, List.class);
-//            for (Object o: data){
-//                   String str = mapper.writeValueAsString(o);
-//                   City city = mapper.readValue(str.toLowerCase(),City.class);
-//                   if(city.getId().equals(arr[0])){
-//                           for (int i = 0 ; i < city.getDistricts().size();i++){
-//                               if(city.getDistricts().get(i).getId().equals(arr[1]))
-//                                   address_name = city.getDistricts().get(i).getName();
-//                           }
-//                   }
-//
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+            arr= address.split("-");
+        try {
+            URL url = new URL("https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json");
+            List<Object> data = mapper.readValue(url, List.class);
+            for (Object o: data){
+                   String str = mapper.writeValueAsString(o);
+                   City city = mapper.readValue(str.toLowerCase(),City.class);
+                   if(city.getId().equals(arr[0])){
+                           for (int i = 0 ; i < city.getDistricts().size();i++){
+                               if(city.getDistricts().get(i).getId().equals(arr[1]))
+                                   address_name = city.getDistricts().get(i).getName();
+                           }
+                   }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         address_name = address_name.replaceAll("(huyện|quận|thị xã)\\s+", "");
         int number = 0 ;
 

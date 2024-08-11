@@ -3,6 +3,8 @@ package com.codegym.service.impl;
 import com.codegym.model.*;
 import com.codegym.repository.*;
 import com.codegym.service.IOrdersService;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import lombok.SneakyThrows;
 import org.aspectj.weaver.ast.Or;
 import org.hibernate.query.Order;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Array;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -37,6 +40,9 @@ public class OrdersService implements IOrdersService {
 
     @Autowired
     private FoodRepository foodRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
 
     @Override
     public Orders getOrder(Long id) {
@@ -197,7 +203,6 @@ public class OrdersService implements IOrdersService {
         for(String s: ships){
             longs.add(Long.parseLong(s));
         }
-        System.out.println(Arrays.toString(dates.toArray()));
         List<Orders> orders = ordersRepository.filterOrders(str,longs,dates.get(0),dates.get(1));
         if(!str.equals("")){
             Optional<Orders> optional = ordersRepository.findById(Long.parseLong(str));
@@ -241,6 +246,26 @@ public class OrdersService implements IOrdersService {
     }
 
 
+    @Override
+    public List<Double> calculateProfit(Orders orders) {
+        List<Double> profits = new LinkedList<>();
+        double totalPrice = 0;
+        double quantity = 0;
+        for(OrderProduct o: orders.getFoods()){
+             totalPrice += o.getTotalPrice();
+             quantity += o.getQuantity();
+        }
+        profits.add(totalPrice);
+//        double totalCoupon = 0;
+//        for (Coupon coupon: orders.getCoupons()){
+//             if(coupon.getType().equals("MINUS"))
+//                 totalCoupon = coupon.getDiscount() * quantity;
+//             else if(coupon.getType().equals("PERCENT"))
+//                 totalCoupon = totalPrice * coupon.getDiscount();
+//        }
+//        profits.add(totalCoupon);
+        return profits;
+    }
 
     @SneakyThrows
     @Override
@@ -265,7 +290,10 @@ public class OrdersService implements IOrdersService {
         }
         List<Orders> months = new LinkedList<>();
         for (int i = 0 ; i < orderId.size();i++){
-            months.add(getOrder(orderId.get(i)));
+            Orders orders = getOrder(orderId.get(i));
+            List<Double> profits = calculateProfit(orders);
+            orders.setTotal(profits.get(0));
+            months.add(orders);
         }
         back.put("orders",months);
         List<Long> bestsellerId = ordersRepository.getBestSellerTodayByShopId(id);
@@ -337,14 +365,23 @@ public class OrdersService implements IOrdersService {
        newOrder.setDate(new Date(System.currentTimeMillis()));
        newOrder.setStatus(orders.getStatus());
        newOrder.setShippingAddress(orders.getShippingAddress());
+        Cart cart = cartRepository.findCartByUserId(orders.getUser().getId()).get();
+        Set<Food> foods = cart.getFood();
+        Set<Food> newFoods = new HashSet<>();
         for (OrderProduct orderProduct: products){
+            for (Food food: foods){
+                if(!food.getId().equals(orderProduct.getProduct().getId()))
+                        newFoods.add(food);
+            }
             orderProduct.getOrderProductPK().setOrder(newOrder);
             orderProductRepository.save(orderProduct);
             Food food = orderProduct.getProduct();
             food.setQuantity(foodRepository.findById(food.getId()).get().getQuantity() + orderProduct.getQuantity());
             foodRepository.save(food);
         }
-       ordersRepository.save(newOrder);
+        ordersRepository.save(newOrder);
+        cart.setFood(newFoods);
+        cartRepository.save(cart);
     }
 
     @Override

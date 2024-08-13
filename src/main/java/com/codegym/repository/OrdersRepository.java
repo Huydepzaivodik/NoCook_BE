@@ -4,6 +4,7 @@ import com.codegym.model.Orders;
 import com.codegym.model.Role;
 import com.codegym.model.Shop;
 import com.codegym.model.User;
+import jakarta.persistence.criteria.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.relational.core.sql.In;
@@ -59,4 +60,8 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
 
     @Query(value = "select o.user_id from orders o inner join orders_shops os on os.orders_id = o.id where os.shops_id = ?1 group by o.user_id",nativeQuery = true)
     List<Long> getUserByShopId(Long id);
+
+    @Query(value = "select * from orders o where o.shop_id=?1",nativeQuery = true)
+    List<Orders> getAllOrdersByShopId(Long id);
+
 }

@@ -35,6 +35,7 @@ public interface IOrdersService extends IGenerateService<Orders>{
 
     List<Orders> getOrdersByUserIdAndShopId(Long user,Long shop);
 
-
     List<Double> calculateProfit(Orders orders);
+
+
 }
